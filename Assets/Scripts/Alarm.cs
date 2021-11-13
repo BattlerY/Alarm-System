@@ -9,26 +9,26 @@ public class Alarm : MonoBehaviour
     [SerializeField] private Sprite _openDoor;
     [SerializeField] private Sprite _closeDoor;
     [SerializeField] private float _alarmFullVolumeTime;
+    [SerializeField] private int _houseId;
 
     private AudioSource _alarmSignal;
     private float _alarmContinueTime;
-    private bool _isInsiderInside;
+    private Coroutine _volumeIncrease;
 
     private void Awake()
     {
-        _isInsiderInside = false;
         _alarmSignal = GetComponent<AudioSource>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Insider"))
+        if (collision.TryGetComponent<Player>(out Player player) && player.CanEnter(_houseId)==false)
         {
             _alarmContinueTime = 0;
             _door.sprite = _openDoor;
             _alarmSignal.volume = 0;
             _alarmSignal.Play();
-            _isInsiderInside = true;
+            _volumeIncrease = StartCoroutine(IncreaseVolume());
         }
     }
 
@@ -36,15 +36,16 @@ public class Alarm : MonoBehaviour
     {
         _door.sprite = _closeDoor;
         _alarmSignal.Pause();
-        _isInsiderInside = false;
+        StopCoroutine(_volumeIncrease);
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
+    private IEnumerator IncreaseVolume()
     {
-        if (_isInsiderInside)
+        while (_alarmContinueTime<_alarmFullVolumeTime)
         {
-            _alarmContinueTime += Time.deltaTime;
+            _alarmContinueTime = _alarmContinueTime + Time.deltaTime;
             _alarmSignal.volume = Mathf.MoveTowards(0, 1, _alarmContinueTime / _alarmFullVolumeTime);
+            yield return null;
         }
     }
 }
