@@ -11,10 +11,4 @@ public class Player : MonoBehaviour
         transform.Translate(transform.right * _speed * Time.deltaTime * Input.GetAxis("Horizontal"));
         transform.Translate(transform.up * _speed * Time.deltaTime * Input.GetAxis("Vertical"));
     }
-
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-      
-    }
 }
