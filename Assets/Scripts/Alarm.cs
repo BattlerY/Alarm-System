@@ -13,7 +13,7 @@ public class Alarm : MonoBehaviour
 
     private AudioSource _alarmSignal;
     private float _alarmContinueTime;
-    private Coroutine _volumeIncrease;
+    private Coroutine _changeVolumeCoroutine;
     private bool _isInsiderInside;
 
     private void Awake()
@@ -29,7 +29,7 @@ public class Alarm : MonoBehaviour
             _door.sprite = _openDoor;
             _alarmSignal.volume = 0;
             _alarmSignal.Play();
-            _volumeIncrease = StartCoroutine(IncreaseVolume(true));
+            _changeVolumeCoroutine = StartCoroutine(ChangeVolume(true));
         }
     }
 
@@ -37,11 +37,11 @@ public class Alarm : MonoBehaviour
     {
         _door.sprite = _closeDoor;
         _isInsiderInside = false;
-        StopCoroutine(_volumeIncrease);
-        StartCoroutine(IncreaseVolume(false));
+        StopCoroutine(_changeVolumeCoroutine);
+        StartCoroutine(ChangeVolume(false));
     }
 
-    private IEnumerator IncreaseVolume(bool isIncrease)
+    private IEnumerator ChangeVolume(bool isIncrease)
     {
         float startPosition = _alarmSignal.volume;
         float endPosition = isIncrease == true ? 1 : 0;
@@ -55,7 +55,7 @@ public class Alarm : MonoBehaviour
         }
 
         if((isIncrease==false && _isInsiderInside) || isIncrease)
-            _volumeIncrease = StartCoroutine(IncreaseVolume(!isIncrease));
+            _changeVolumeCoroutine = StartCoroutine(ChangeVolume(!isIncrease));
         else
             _alarmSignal.Pause();
     }
