@@ -8,6 +8,8 @@ public class Player : MonoBehaviour
 
     private List<int> _houseKeys;
 
+    public bool CanEnter(int keyId) => _houseKeys.Contains(keyId);
+    
     private void Awake()
     {
         _houseKeys = new List<int>();
@@ -18,7 +20,4 @@ public class Player : MonoBehaviour
         transform.Translate(transform.right * _speed * Time.deltaTime * Input.GetAxis("Horizontal"));
         transform.Translate(transform.up * _speed * Time.deltaTime * Input.GetAxis("Vertical"));
     }
-
-    public bool CanEnter(int keyId) => _houseKeys.Contains(keyId);
-
 }
