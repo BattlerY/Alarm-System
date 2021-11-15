@@ -39,15 +39,21 @@ public class Alarm : MonoBehaviour
     private IEnumerator ChangeVolume()
     {
         float _alarmContinueTime = 0;
-        int direction = 1;
+        float startPosition = _alarmSignal.volume;
+        float endPosition = 1;
         
         while (true)
         {
-            _alarmContinueTime += Time.deltaTime * direction;
-            _alarmSignal.volume = Mathf.MoveTowards(0, 1, _alarmContinueTime / _alarmFullVolumeTime);
+            _alarmContinueTime += Time.deltaTime;
+            _alarmSignal.volume = Mathf.MoveTowards(startPosition, endPosition, _alarmContinueTime / _alarmFullVolumeTime);
 
             if (_alarmSignal.volume == 0 || _alarmSignal.volume == 1)
-                direction *= -1;
+            {
+                float temp = startPosition;
+                startPosition = endPosition;
+                endPosition = temp;
+                _alarmContinueTime = 0;
+            }
 
             yield return null;
         }
