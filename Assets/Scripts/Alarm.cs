@@ -39,10 +39,9 @@ public class Alarm : MonoBehaviour
     private IEnumerator ChangeVolume()
     {
         float _alarmContinueTime = 0;
-        bool isRun = true;
         int direction = 1;
-
-        while (isRun)
+        
+        while (true)
         {
             _alarmContinueTime += Time.deltaTime * direction;
             _alarmSignal.volume = Mathf.MoveTowards(0, 1, _alarmContinueTime / _alarmFullVolumeTime);
