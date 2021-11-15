@@ -12,9 +12,7 @@ public class Alarm : MonoBehaviour
     [SerializeField] private int _houseId;
 
     private AudioSource _alarmSignal;
-    private float _alarmContinueTime;
-    private Coroutine _changeVolumeCoroutine;
-    private bool _isInsiderInside;
+    private Coroutine _changeVolume;
 
     private void Awake()
     {
@@ -25,38 +23,34 @@ public class Alarm : MonoBehaviour
     {
         if (collision.TryGetComponent<Player>(out Player player) && player.CanEnter(_houseId)==false)
         {
-            _isInsiderInside = true;
             _door.sprite = _openDoor;
             _alarmSignal.volume = 0;
             _alarmSignal.Play();
-            _changeVolumeCoroutine = StartCoroutine(ChangeVolume(true));
+            _changeVolume = StartCoroutine(ChangeVolume());
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
         _door.sprite = _closeDoor;
-        _isInsiderInside = false;
-        StopCoroutine(_changeVolumeCoroutine);
-        StartCoroutine(ChangeVolume(false));
+        StopCoroutine(_changeVolume);
     }
 
-    private IEnumerator ChangeVolume(bool isIncrease)
+    private IEnumerator ChangeVolume()
     {
-        float startPosition = _alarmSignal.volume;
-        float endPosition = isIncrease == true ? 1 : 0;
-        _alarmContinueTime = 0;
+        float _alarmContinueTime = 0;
+        bool isRun = true;
+        int direction = 1;
 
-        while (_alarmSignal.volume != endPosition)
+        while (isRun)
         {
-            _alarmContinueTime += Time.deltaTime;
-            _alarmSignal.volume = Mathf.MoveTowards(startPosition, endPosition, _alarmContinueTime / _alarmFullVolumeTime);
+            _alarmContinueTime += Time.deltaTime * direction;
+            _alarmSignal.volume = Mathf.MoveTowards(0, 1, _alarmContinueTime / _alarmFullVolumeTime);
+
+            if (_alarmSignal.volume == 0 || _alarmSignal.volume == 1)
+                direction *= -1;
+
             yield return null;
         }
-
-        if((isIncrease==false && _isInsiderInside) || isIncrease)
-            _changeVolumeCoroutine = StartCoroutine(ChangeVolume(!isIncrease));
-        else
-            _alarmSignal.Pause();
     }
 }
